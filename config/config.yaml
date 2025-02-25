@@ -9,7 +9,7 @@ bringup:
 
 live_processing:
   ros__parameters:
-    undistort: True
+    undistort: False
 
     K: 
       - 305.8511660909695

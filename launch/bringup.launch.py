@@ -7,6 +7,7 @@ from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     # Declare launch arguments
@@ -55,6 +56,20 @@ def generate_launch_description():
         output='screen'
     )
 
+    imu_node = Node(
+        package='imu_filter_madgwick',
+        executable='imu_filter_madgwick_node',
+        name='imu_filter',
+        output='screen',
+        parameters=[
+            PathJoinSubstitution([
+                FindPackageShare('insta360_ros_driver'),
+                'config',
+                'imu_filter.yaml'
+            ])
+        ]
+    )
+
     # Define the get_images node
     get_images_node = Node(
         package='insta360_ros_driver',
@@ -78,6 +93,7 @@ def generate_launch_description():
     # Add nodes to the launch description
     ld.add_action(bringup_node)
     ld.add_action(live_processing_node)
+    ld.add_action(imu_node)
     ld.add_action(get_images_node)
 
     return ld
