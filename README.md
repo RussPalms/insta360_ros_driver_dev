@@ -1,11 +1,11 @@
 # insta360_ros_driver
 
-A ROS driver for the Insta360 cameras. This driver is tested on Ubuntu 22.04 with ROS2 Humble. The driver has also been verified on the Insta360 X2 and X3 cameras.
-
-For X4 cameras, see this [fix](https://github.com/ai4ce/insta360_ros_driver/issues/13#issuecomment-2727005037)
+A ROS driver for the Insta360 cameras. This driver is tested on Ubuntu 22.04 with ROS2 Humble. The driver has also been verified on the Insta360 X2 and X3 cameras. By default, we are able to stream 1920 x 960 images.
 
 ## Installation
 To use this driver, you need to first have Insta360 SDK. Please apply for the SDK from the [Insta360 website](https://www.insta360.com/sdk/home). 
+
+**Note: Please make you use the latest SDK. This package works with the SDK posted after April 23, 2025**
 
 ```
 cd ~/ros2_ws/src
@@ -65,12 +65,12 @@ A dual fisheye image will be published.
 The launch file has the following optional arguments:
 - equirectangular (default="true")
 
-This publishes equirectangular images.
+This publishes equirectangular images. You can configure these parameters in `config/equirectangular.yaml`.
 ![equirectangular](docs/equirectangular.png)
 
 - imu_filter (default="true")
 
-This uses the [imu_filter_madgwick](https://wiki.ros.org/imu_filter_madgwick) package to approximate orientation from the IMU.
+This uses the [imu_filter_madgwick](https://wiki.ros.org/imu_filter_madgwick) package to approximate orientation from the IMU. Note that by default, we publish `/imu/data_raw` which only contains linear acceleration and angular velocity. The madgwick filter uses this information to publish orientation to `/imu/data`. You can configure the filter in `config/imu_filter.yaml`. 
 
 ![IMU](https://github.com/user-attachments/assets/02b50cad-8415-4dde-9014-9ab3a4d415b9)
 
@@ -79,8 +79,36 @@ You can adjust the extrinsic parameters used to improve the equirectangular imag
 ```
 # Run the camera driver
 ros2 run insta360_ros_driver insta360_ros_driver
+# Activate image decoding
+ros2 run insta360_ros_driver decode.py
 # Run the equirectangular node in calibration mode
 ros2 run insta360_ros_driver equirectangular.py --calibrate
+```
+This will open an app to adjust the extrinsics. You need to press 'a' to update the parameters and you can press 's' to get the parameters in YAML format.
+![Equirectangular Calibration](docs/calibration.png)
+
+Pressing 's' will return the parameters via the terminal. You can copy paste this onto the configuration file as needed. By default, the launch file reads this from `config/equirectangular.yaml`
+
+```
+==================================================
+CALIBRATION PARAMETERS (YAML FORMAT)
+==================================================
+equirectangular_node:
+  ros__parameters:
+    cx_offset: 0.0
+    cy_offset: 0.0
+    crop_size: 960
+    translation: [0.0, 0.0, -0.105]
+    rotation_deg: [-0.5, 0.0, 1.1]
+    gpu: True
+    out_width: 1920
+    out_height: 960
+==================================================
+```
+
+Note that decode.py will most likely drop frames depending on your system. If you do not care about live processing, you can simply record the `/dual_fisheye/image/compressed` topic and decompress it later after recording.
+```
+ros2 bag record /dual_fisheye/image /imu/data_raw
 ```
 
 ## Star History
