@@ -39,8 +39,8 @@ class EquirectangularNode(Node):
         self.load_parameters()
         
         # Initialize GPU settings
-        self.use_cuda = torch.cuda.is_available() and self.gpu_enabled
-        self.get_logger().info(f"GPU acceleration: requested={self.gpu_enabled}, available={torch.cuda.is_available()}, using={self.use_cuda}")
+        self.use_cuda = torch.cuda.is_available() and getattr(self, 'gpu_enabled', True)
+        self.get_logger().info(f"GPU acceleration: requested={getattr(self, 'gpu_enabled', True)}, available={torch.cuda.is_available()}, using={self.use_cuda}")
         self.device = torch.device('cuda' if self.use_cuda else 'cpu')
 
         self.calibration_mode = enable_calibration
@@ -93,28 +93,34 @@ class EquirectangularNode(Node):
     
     def load_parameters(self):
         """Load parameters from ROS parameter server"""
-        self.cx_offset = self.get_parameter('cx_offset').get_parameter_value().double_value
-        self.cy_offset = self.get_parameter('cy_offset').get_parameter_value().double_value
-        self.crop_size = self.get_parameter('crop_size').get_parameter_value().integer_value
-        self.out_width = self.get_parameter('out_width').get_parameter_value().integer_value
-        self.out_height = self.get_parameter('out_height').get_parameter_value().integer_value
-        self.gpu_enabled = self.get_parameter('gpu').get_parameter_value().bool_value
-        
-        translation = self.get_parameter('translation').get_parameter_value().double_array_value
-        self.tx, self.ty, self.tz = translation
-        
-        rotation_deg = self.get_parameter('rotation_deg').get_parameter_value().double_array_value
-        self.roll = math.radians(rotation_deg[0])
-        self.pitch = math.radians(rotation_deg[1])
-        self.yaw = math.radians(rotation_deg[2])
-        
-        self.get_logger().info(f"Loaded parameters from ROS parameter server")
-        self.get_logger().info(f"  Crop size: {self.crop_size}")
-        self.get_logger().info(f"  Center offset: ({self.cx_offset}, {self.cy_offset})")
-        self.get_logger().info(f"  Translation: [{self.tx}, {self.ty}, {self.tz}]")
-        self.get_logger().info(f"  Rotation (deg): {rotation_deg}")
-        self.get_logger().info(f"  Output size: {self.out_width}x{self.out_height}")
-        self.get_logger().info(f"  GPU enabled: {self.gpu_enabled}")
+        try:
+            self.cx_offset = self.get_parameter('cx_offset').get_parameter_value().double_value
+            self.cy_offset = self.get_parameter('cy_offset').get_parameter_value().double_value
+            self.crop_size = self.get_parameter('crop_size').get_parameter_value().integer_value
+            self.out_width = self.get_parameter('out_width').get_parameter_value().integer_value
+            self.out_height = self.get_parameter('out_height').get_parameter_value().integer_value
+            self.gpu_enabled = self.get_parameter('gpu').get_parameter_value().bool_value
+            
+            translation = self.get_parameter('translation').get_parameter_value().double_array_value
+            self.tx, self.ty, self.tz = translation
+            
+            rotation_deg = self.get_parameter('rotation_deg').get_parameter_value().double_array_value
+            self.roll = math.radians(rotation_deg[0])
+            self.pitch = math.radians(rotation_deg[1])
+            self.yaw = math.radians(rotation_deg[2])
+            
+            self.get_logger().info(f"Loaded parameters from ROS parameter server")
+            self.get_logger().info(f"  Crop size: {self.crop_size}")
+            self.get_logger().info(f"  Center offset: ({self.cx_offset}, {self.cy_offset})")
+            self.get_logger().info(f"  Translation: [{self.tx}, {self.ty}, {self.tz}]")
+            self.get_logger().info(f"  Rotation (deg): {rotation_deg}")
+            self.get_logger().info(f"  Output size: {self.out_width}x{self.out_height}")
+            self.get_logger().info(f"  GPU enabled: {self.gpu_enabled}")
+        except Exception as e:
+            self.get_logger().error(f"Error loading parameters: {e}")
+            # Set defaults if parameter loading fails
+            self.gpu_enabled = True
+            raise
     
     def save_calibration(self):
         """Save current calibration parameters to ROS parameter server"""
