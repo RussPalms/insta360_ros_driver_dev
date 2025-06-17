@@ -58,11 +58,8 @@ install(TARGETS ${PROJECT_NAME}
 
 ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
-  scripts/undistort.py
   scripts/equirectangular.py
-  scripts/offline_equirectangular.py
-  scripts/offline_calibration.py
-  scripts/webcam.py
+  scripts/decode.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

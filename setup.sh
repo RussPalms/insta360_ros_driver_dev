@@ -5,7 +5,7 @@
 
 #Add permissions for USB port
 # udevadm info --name /dev/bus/usb/003/026 --attribute-walk
-echo SUBSYSTEM=='"usb"', ATTR{manufacturer}=='"Arashi Vision"', SYMLINK+='"insta"' | sudo tee /etc/udev/rules.d/99-insta.rules
+echo SUBSYSTEM=='"usb"', ATTR{manufacturer}=='"Arashi Vision"', SYMLINK+='"insta"', MODE='"0777"' | sudo tee /etc/udev/rules.d/99-insta.rules
 #Trigger SYMLINK creation
 sudo udevadm trigger
 
