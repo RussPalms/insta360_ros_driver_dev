@@ -50,9 +50,25 @@ ament_target_dependencies(${PROJECT_NAME}
   std_srvs
   OpenCV
 )
-target_link_libraries(${PROJECT_NAME} CameraSDK ${AVCODEC_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVUTIL_LIBRARIES} ${SWSCALE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} CameraSDK  ${OpenCV_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVUTIL_LIBRARIES} ${SWSCALE_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+add_executable(decoder src/decoder.cpp)
+ament_target_dependencies(decoder
+  rclcpp
+  camera_info_manager
+  cv_bridge
+  image_transport
+  std_msgs
+  std_srvs
+  OpenCV
+)
+target_link_libraries(decoder CameraSDK  ${OpenCV_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVUTIL_LIBRARIES} ${SWSCALE_LIBRARIES})
+
+install(TARGETS decoder
   DESTINATION lib/${PROJECT_NAME}
 )
 
