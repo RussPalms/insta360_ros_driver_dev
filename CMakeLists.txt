@@ -75,7 +75,6 @@ install(TARGETS decoder
 ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/equirectangular.py
-  scripts/decode.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
