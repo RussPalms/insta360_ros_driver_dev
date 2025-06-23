@@ -5,8 +5,9 @@
 
 #Add permissions for USB port
 # udevadm info --name /dev/bus/usb/003/026 --attribute-walk
-echo SUBSYSTEM=='"usb"', ATTR{manufacturer}=='"Arashi Vision"', SYMLINK+='"insta"', MODE='"0777"' | sudo tee /etc/udev/rules.d/99-insta.rules
-#Trigger SYMLINK creation
+echo SUBSYSTEM=='"usb"', ATTRS{idVendor}=='"2e1a"', ATTRS{idProduct}=='"00c1"', SYMLINK+='"insta"', MODE='"0777"' | sudo tee /etc/udev/rules.d/99-insta.rules
+#Reload and trigger udev rules
+sudo udevadm control --reload-rules
 sudo udevadm trigger
 
 #Grant permission for camera port
