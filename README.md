@@ -29,6 +29,12 @@ source install/setup.bash
 
 Before continuing, **make sure the camera is set to dual-lens mode**
 
+Additionally, **ensure the camera's USB mode is set to Android**:
+1. On the camera, swipe down the screen to the main menu
+2. Go to Settings -> General
+3. Set USB Mode to **Android** (not Webcam or other modes)
+4. This is required for the ROS driver to properly detect and communicate with the camera (see [Issue #4](https://github.com/ai4ce/insta360_ros_driver/issues/4))
+
 The Insta360 requires sudo privilege to be accessed via USB. To compensate for this, a udev configuration can be automatically created that will only request for sudo once. The camera can thus be setup initially via:
 ```
 cd ~/ros2_ws/src/insta360_ros_driver
@@ -41,6 +47,7 @@ This creates a symlink  based on the vendor ID of Insta360 cameras. The symlink,
 **Sometimes, this does not work (e.g. you see "device /dev/insta not found" or something similar). You can try entering the commands manually, since that sometimes sees success, especially for the first time.**
 ```
 echo SUBSYSTEM=='"usb"', ATTR{manufacturer}=='"Arashi Vision"', SYMLINK+='"insta"', MODE='"0777"' | sudo tee /etc/udev/rules.d/99-insta.rules
+sudo udevadm control --reload-rules
 sudo udevadm trigger
 sudo chmod 777 /dev/insta
 ```
