@@ -76,7 +76,7 @@ A dual fisheye image will be published.
 - /imu/data_raw
 
 The launch file has the following optional arguments:
-- equirectangular (default="tfalse")
+- equirectangular (default="false")
 
 This publishes equirectangular images. You can configure these parameters in `config/equirectangular.yaml`.
 ![equirectangular](docs/equirectangular.png)
